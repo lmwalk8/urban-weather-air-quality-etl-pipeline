@@ -6,7 +6,7 @@ def extract_weather_data():
     Fetches weather and air quality data from the local CSV.
 
     Returns:
-        df: The weather and air quality data in a DataFrame.
+        df (pd.DataFrame): The weather and air quality data in a DataFrame.
     """
     logging.info("Attempting to extract all weather and air quality data from CSV")
 
