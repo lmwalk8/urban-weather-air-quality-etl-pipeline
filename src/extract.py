@@ -12,7 +12,7 @@ def extract_weather_data():
 
     try:
         df = pd.read_csv("UrbanAirQualityandHealthImpactDataset.csv")
-        logging.error("Successfully extracted the data")
+        logging.info("Successfully extracted the data")
         return df
     except Exception as e:
         logging.error(f"Extraction failed for the CSV file: {e}")
