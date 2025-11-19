@@ -1,4 +1,5 @@
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine
+import pandas as pd
 import logging
 
 def create_database_engine(db_url):
@@ -43,18 +44,17 @@ def read_existing_table(table_name, engine):
     Parameters:
         table_name: Name of table the data will be selected from.
         engine: The database engine where the table will be.
+
+    Returns:
+        df (pd.DataFrame): The data from the table as a DataFrame.
     """
     try:
-        # Connect to database engine
-        connection = engine.connect()
-        # Select all rows in table
-        select_rows = select(table_name)
-        result = connection.execute(select_rows)
-        # Fetch results
-        for row in result:
-            print(row)
+        # Read table data into DataFrame
+        query = f"SELECT * FROM {table_name}"
+        result = pd.read_sql(query, engine)
         logging.info(f"Data fetched from the existing table {table_name} successfully!")
-        # Close database connection
-        connection.close()
+        # Return results as DataFrame
+        return result
     except Exception as e:
         logging.error(f"Error fetching data from PostgreSQL table: {e}")
+        return None
