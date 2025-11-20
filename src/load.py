@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 import pandas as pd
+import numpy as np
 import logging
 
 def create_database_engine(db_url):
@@ -10,12 +11,11 @@ def create_database_engine(db_url):
         db_url: Specifically defined URL for a database
 
     Returns:
-        db (database engine): The PostgreSQL database engine.
+        engine (database engine): The PostgreSQL database engine.
     """
     try:
         engine = create_engine(db_url)
         return engine
-    # engine.dispose()
     except Exception as e:
         logging.error(f"Error creating database engine: {e}")
 
@@ -28,8 +28,6 @@ def load_data_into_database_table(df, table_name, engine):
         table_name: Name of table the data will be loaded into.
         engine: The database engine where the table will be.
     """
-    # engine = create_database_engine()
-
     try:
         # Load DataFrame into PostgreSQL table
         df.to_sql(table_name, engine, if_exists='replace', index=False)
@@ -46,12 +44,13 @@ def read_existing_table(table_name, engine):
         engine: The database engine where the table will be.
 
     Returns:
-        df (pd.DataFrame): The data from the table as a DataFrame.
+        result (pd.DataFrame): The data from the table as a DataFrame.
     """
     try:
         # Read table data into DataFrame
         query = f"SELECT * FROM {table_name}"
         result = pd.read_sql(query, engine)
+        result = result.replace({None: np.nan})
         logging.info(f"Data fetched from the existing table {table_name} successfully!")
         # Return results as DataFrame
         return result

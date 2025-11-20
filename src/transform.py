@@ -25,9 +25,9 @@ def transform_data(df):
     df_transformed = df_transformed.drop_duplicates()
     
     # Convert to datetime objects
-    df_transformed['datetime'] = pd.to_datetime(df_transformed['datetime'])
-    df_transformed['sunrise'] = pd.to_datetime(df_transformed['sunrise'])
-    df_transformed['sunset'] = pd.to_datetime(df_transformed['sunset'])
+    df_transformed['datetime'] = pd.to_datetime(df_transformed['datetime'], errors='coerce')
+    df_transformed['sunrise'] = _parse_datetime(df_transformed['sunrise'])
+    df_transformed['sunset'] = _parse_datetime(df_transformed['sunset'])
 
     # Define weather-related columns
     weather_columns = [
@@ -53,3 +53,30 @@ def transform_data(df):
 
     logging.info("Weather and air quality data transformed successfully into two separate DataFrames!")
     return weather_df, air_quality_df
+
+def _parse_datetime(series):
+    """
+    Parse a column that may contain either full datetime strings or only HH:MM:SS values.
+    """
+    if pd.api.types.is_datetime64_any_dtype(series):
+        return series
+
+    series_str = series.astype('string')
+    time_mask = series_str.str.match(r'^\d{1,2}:\d{2}:\d{2}$', na=False)
+
+    parsed = pd.Series(pd.NaT, index=series.index, dtype='datetime64[ns]')
+
+    if time_mask.any():
+        parsed.loc[time_mask] = pd.to_datetime(
+            series_str.loc[time_mask],
+            format='%H:%M:%S',
+            errors='coerce'
+        )
+
+    if (~time_mask).any():
+        parsed.loc[~time_mask] = pd.to_datetime(
+            series_str.loc[~time_mask],
+            errors='coerce'
+        )
+
+    return parsed
