@@ -16,7 +16,10 @@ def transform_data(df):
     logging.info("Transforming the weather and air quality data...")
 
     # Fill missing values
-    df_transformed['preciptype'] = df_transformed['preciptype'].fillna('None')
+    # Replace list values like ['rain'] with 'rain', then fill NaN with 'None'
+    df_transformed['preciptype'] = df_transformed['preciptype'].apply(
+        lambda x: x[0] if isinstance(x, list) and len(x) > 0 else x
+    ).fillna('None')
     df_transformed['stations'] = df_transformed['stations'].fillna('N/A')
     df_transformed['Condition_Code'] = df_transformed['Condition_Code'].fillna(-1)
     df_transformed['snowdepth'] = df_transformed['snowdepth'].fillna(0)
