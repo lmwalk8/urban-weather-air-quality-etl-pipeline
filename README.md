@@ -39,7 +39,9 @@ source air_quality_project_env/bin/activate (Linux/macOS) OR air_quality_project
 ```
 
 3. Install all required dependencies:
-`pip install -r requirements.txt`
+```
+pip install -r requirements.txt
+```
 
 4. Set up required environment variables:
 ```
